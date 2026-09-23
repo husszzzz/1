@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b12">
+  <meta name="description" content="Hassany Football - بث مباشر لكرة القدم">
+  <title>Hassany Football</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <style>
+    :root{
+      --bg:#07070b;
+      --card:#111118;
+      --card2:#171720;
+      --text:#fff;
+      --muted:#a7a7b5;
+      --accent:#7c3aed;
+      --accent2:#a855f7;
+      --green:#22c55e;
+      --border:rgba(255,255,255,.08);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Tahoma,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%,rgba(124,58,237,.30),transparent 35%),
+        linear-gradient(180deg,#09090f 0%,#050507 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    a{text-decoration:none;color:inherit}
+    button{font:inherit}
+
+    .container{
+      width:min(1100px,92%);
+      margin:auto;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      background:rgba(7,7,11,.78);
+      border-bottom:1px solid var(--border);
+    }
+
+    .nav{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:11px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+
+    .brand img{
+      width:44px;
+      height:44px;
+      border-radius:13px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 8px 30px rgba(124,58,237,.25);
+    }
+
+    .brand span{
+      font-size:19px;
+    }
+
+    .telegram-btn{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      padding:11px 16px;
+      border-radius:13px;
+      font-size:13px;
+      font-weight:800;
+      box-shadow:0 10px 30px rgba(124,58,237,.25);
+    }
+
+    .hero{
+      padding:48px 0 26px;
+      text-align:center;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 13px;
+      border-radius:999px;
+      background:rgba(124,58,237,.12);
+      border:1px solid rgba(168,85,247,.25);
+      color:#d8b4fe;
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:15px;
+    }
+
+    .live-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:#ef4444;
+      box-shadow:0 0 0 5px rgba(239,68,68,.12);
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(32px,7vw,62px);
+      line-height:1;
+      letter-spacing:-1.8px;
+    }
+
+    .hero p{
+      color:var(--muted);
+      margin:15px auto 0;
+      max-width:650px;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .match-card{
+      margin:22px auto 28px;
+      padding:22px;
+      border-radius:24px;
+      background:
+        linear-gradient(145deg,rgba(124,58,237,.17),rgba(255,255,255,.025)),
+        var(--card);
+      border:1px solid var(--border);
+      box-shadow:0 20px 70px rgba(0,0,0,.28);
+    }
+
+    .match-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:20px;
+    }
+
+    .live-label{
+      color:#fecaca;
+      background:rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.18);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+    }
+
+    .teams{
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      align-items:center;
+      gap:15px;
+    }
+
+    .team{
+      text-align:center;
+      font-weight:900;
+      font-size:clamp(18px,4vw,28px);
+    }
+
+    .team small{
+      display:block;
+      color:var(--muted);
+      font-weight:600;
+      font-size:11px;
+      margin-top:5px;
+    }
+
+    .vs{
+      width:54px;height:54px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:#09090e;
+      border:1px solid var(--border);
+      color:#c4b5fd;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .player-wrap{
+      overflow:hidden;
+      border-radius:22px;
+      background:#000;
+      border:1px solid var(--border);
+      box-shadow:0 25px 70px rgba(0,0,0,.45);
+    }
+
+    video{
+      display:block;
+      width:100%;
+      aspect-ratio:16/9;
+      background:#000;
+      object-fit:contain;
+    }
+
+    .player-status{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:11px 14px;
+      background:#0d0d13;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .status-live{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      color:#86efac;
+      font-weight:800;
+    }
+
+    .status-live i{
+      width:7px;height:7px;border-radius:50%;
+      background:var(--green);
+    }
+
+    .section-title{
+      margin:36px 0 15px;
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:15px;
+    }
+
+    .section-title h2{
+      margin:0;
+      font-size:22px;
+    }
+
+    .section-title span{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .quality-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .quality-btn{
+      cursor:pointer;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:white;
+      border-radius:18px;
+      padding:17px 14px;
+      text-align:right;
+      transition:.2s;
+    }
+
+    .quality-btn:hover,.quality-btn.active{
+      transform:translateY(-2px);
+      border-color:rgba(168,85,247,.55);
+      background:linear-gradient(145deg,rgba(124,58,237,.18),var(--card));
+    }
+
+    .quality-btn strong{
+      display:block;
+      font-size:14px;
+      margin-bottom:5px;
+    }
+
+    .quality-btn small{
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin:25px 0 45px;
+    }
+
+    .info{
+      padding:18px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.025);
+      border-radius:18px;
+    }
+
+    .info b{
+      display:block;
+      margin-bottom:7px;
+      font-size:14px;
+    }
+
+    .info span{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      padding:24px 0 35px;
+      color:var(--muted);
+      text-align:center;
+      font-size:12px;
+    }
+
+    /* Subscription modal */
+    .overlay{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(0,0,0,.76);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .modal{
+      width:min(430px,100%);
+      border-radius:27px;
+      padding:26px;
+      text-align:center;
+      background:
+        radial-gradient(circle at 50% 0%,rgba(124,58,237,.25),transparent 42%),
+        #111118;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 30px 100px rgba(0,0,0,.6);
+      animation:pop .25s ease-out;
+    }
+
+    @keyframes pop{
+      from{opacity:0;transform:scale(.96) translateY(8px)}
+      to{opacity:1;transform:none}
+    }
+
+    .modal-logo{
+      width:76px;height:76px;
+      border-radius:22px;
+      object-fit:cover;
+      margin-bottom:15px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 15px 45px rgba(124,58,237,.3);
+    }
+
+    .modal h3{
+      margin:0 0 9px;
+      font-size:23px;
+    }
+
+    .modal p{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.8;
+      margin:0 0 19px;
+    }
+
+    .subscribe{
+      display:block;
+      padding:14px 18px;
+      border-radius:15px;
+      background:linear-gradient(135deg,#7c3aed,#a855f7);
+      font-weight:900;
+      margin-bottom:10px;
+      box-shadow:0 12px 35px rgba(124,58,237,.25);
+    }
+
+    .continue{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:#fff;
+      padding:12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .note{
+      margin-top:12px!important;
+      margin-bottom:0!important;
+      font-size:10px!important;
+    }
+
+    @media(max-width:700px){
+      .nav{min-height:64px}
+      .brand img{width:39px;height:39px}
+      .brand span{font-size:16px}
+      .telegram-btn{padding:9px 12px;font-size:11px}
+      .hero{padding-top:34px}
+      .quality-grid,.info-grid{grid-template-columns:1fr}
+      .match-card{padding:16px}
+    }
+
+    @media(max-width:430px){
+      .quality-grid{grid-template-columns:1fr 1fr}
+      .quality-btn:last-child{grid-column:1/-1}
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- اشتراك القناة -->
+  <div class="overlay" id="subscribeModal">
+    <div class="modal">
+      <img class="modal-logo" src="https://b.top4top.io/p_3918dokv31.jpg" alt="Hassany Football">
+      <h3>أهلاً بك في Hassany Football ⚽</h3>
+      <p>
+        حتى تتابع البثوث والتحديثات الجديدة، اشترك بقناة
+        <strong>@hassanyIPA</strong> ثم اضغط على متابعة الموقع.
+      </p>
+
+      <a class="subscribe" href="https://t.me/hassanyIPA" target="_blank" rel="noopener">
+        الانتقال إلى القناة
+      </a>
+
+      <button class="continue" onclick="closeModal()">
+        اشتركت بالفعل — دخول للموقع
+      </button>
+
+      <p class="note">
+        ملاحظة: استخدم البثوث التي تملك حق عرضها أو لديك إذن باستخدامها.
+      </p>
+    </div>
+  </div>
+
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#">
+        <img src="https://b.top4top.io/p_3918dokv31.jpg" alt="Logo">
+        <span>Hassany Football</span>
+      </a>
+
+      <a class="telegram-btn" href="https://t.me/hassanyIPA" target="_blank" rel="noopener">
+        قناة التحديثات
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="hero-badge">
+        <i class="live-dot"></i>
+        بث مباشر
+      </div>
+      <h1>Hassany Football</h1>
+      <p>
+        منصة بسيطة وسريعة لمتابعة المباريات والبثوث المباشرة بجودة مناسبة
+        للموبايل والآيفون.
+      </p>
+    </section>
+
+    <section class="match-card">
+      <div class="match-top">
+        <span>كأس الخليج — مباراة اليوم</span>
+        <span class="live-label">LIVE</span>
+      </div>
+
+      <div class="teams">
+        <div class="team">
+          🇮🇶 العراق
+          <small>Iraq</small>
+        </div>
+
+        <div class="vs">VS</div>
+
+        <div class="team">
+          🇴🇲 عُمان
+          <small>Oman</small>
+        </div>
+      </div>
+    </section>
+
+    <div class="player-wrap">
+      <video id="video" controls playsinline preload="metadata"></video>
+
+      <div class="player-status">
+        <span class="status-live"><i></i> البث متصل</span>
+        <span id="qualityLabel">البث الأساسي</span>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-title">
+        <h2>جودة البث</h2>
+        <span>اختر الجودة المناسبة لاتصالك</span>
+      </div>
+
+      <div class="quality-grid">
+        <button class="quality-btn active" data-url="https://stream.mux.com/J8e1DoGLZlG01es018uW2LeVwcucG7VIZZF01hZXlhCaqI.m3u8?redundant_streams=true" data-label="البث الأساسي">
+          <strong>البث الأساسي</strong>
+          <small>Auto / Mux</small>
+        </button>
+
+        <button class="quality-btn" data-url="https://onsidepllus.xyz:8443/live-srt1/main.m3u8" data-label="جودة عالية">
+          <strong>جودة عالية</strong>
+          <small>High Quality</small>
+        </button>
+
+        <button class="quality-btn" data-url="https://onsidepllus.xyz:8443/live-srt1-low/main.m3u8" data-label="جودة متوسطة">
+          <strong>جودة متوسطة</strong>
+          <small>Medium Quality</small>
+        </button>
+      </div>
+    </section>
+
+    <section class="info-grid">
+      <div class="info">
+        <b>⚡ تشغيل سريع</b>
+        <span>مشغل متوافق مع الهاتف والآيفون ويدعم HLS عند توفره.</span>
+      </div>
+
+      <div class="info">
+        <b>📡 أكثر من جودة</b>
+        <span>بدّل بين الجودة الأساسية والعالية والمتوسطة حسب سرعة الإنترنت.</span>
+      </div>
+
+      <div class="info">
+        <b>📲 التحديثات</b>
+        <span>تابع قناة @hassanyIPA لمعرفة البثوث والتحديثات الجديدة.</span>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 Hassany Football — جميع الحقوق محفوظة
+  </footer>
+
+  <script>
+    const video = document.getElementById("video");
+    const qualityLabel = document.getElementById("qualityLabel");
+    const buttons = document.querySelectorAll(".quality-btn");
+
+    let hls = null;
+
+    function playStream(url, label){
+      if(hls){
+        hls.destroy();
+        hls = null;
+      }
+
+      qualityLabel.textContent = label;
+
+      if(video.canPlayType("application/vnd.apple.mpegurl")){
+        video.src = url;
+        video.load();
+        return;
+      }
+
+      if(window.Hls && Hls.isSupported()){
+        hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+          backBufferLength: 30
+        });
+
+        hls.loadSource(url);
+        hls.attachMedia(video);
+
+        hls.on(Hls.Events.ERROR, function(event, data){
+          if(data.fatal){
+            console.warn("HLS error:", data);
+          }
+        });
+      }else{
+        alert("المتصفح لا يدعم تشغيل بث HLS.");
+      }
+    }
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+
+        playStream(button.dataset.url, button.dataset.label);
+      });
+    });
+
+    function closeModal(){
+      document.getElementById("subscribeModal").style.display = "none";
+      sessionStorage.setItem("hassany_subscribed_prompt_seen","1");
+    }
+
+    if(sessionStorage.getItem("hassany_subscribed_prompt_seen") === "1"){
+      document.getElementById("subscribeModal").style.display = "none";
+    }
+
+    playStream(
+      "https://stream.mux.com/J8e1DoGLZlG01es018uW2LeVwcucG7VIZZF01hZXlhCaqI.m3u8?redundant_streams=true",
+      "البث الأساسي"
+    );
+  </script>
+
+</body>
+</html>
